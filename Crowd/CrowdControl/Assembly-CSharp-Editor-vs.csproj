@@ -47,7 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Editor\CopyImportedAnimation.cs" />
-     <None Include="Assets\Cha_Data\Shader\WrapLambert.shader" />
+     <None Include="Assets\Ressources\Cha_Data\Shader\WrapLambert.shader" />
  <Reference Include="Assembly-UnityScript">
  <HintPath>C:/Users/Pierre/Documents/CrowdControl/Library/ScriptAssemblies/Assembly-UnityScript.dll</HintPath>
  </Reference>

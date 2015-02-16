@@ -46,8 +46,8 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Cha_Data\Script\CharaView.js" />
-     <None Include="Assets\Cha_Data\Shader\WrapLambert.shader" />
+     <Compile Include="Assets\Ressources\Cha_Data\Script\CharaView.js" />
+     <None Include="Assets\Ressources\Cha_Data\Shader\WrapLambert.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files (x86)/Unity4_6/Editor/Data/UnityExtensions/Unity/GUISystem/4.6.0/UnityEngine.UI.dll</HintPath>
  </Reference>

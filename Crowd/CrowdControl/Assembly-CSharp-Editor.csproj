@@ -47,7 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Editor\CopyImportedAnimation.cs" />
-     <None Include="Assets\Cha_Data\Shader\WrapLambert.shader" />
+     <None Include="Assets\Ressources\Cha_Data\Shader\WrapLambert.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files (x86)/Unity4_6/Editor/Data/UnityExtensions/Unity/GUISystem/4.6.0/UnityEngine.UI.dll</HintPath>
  </Reference>
