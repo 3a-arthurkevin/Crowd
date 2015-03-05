@@ -25,57 +25,205 @@ public class GameManagerScript : MonoBehaviour {
 	[SerializeField]
 	private float _unitSize = 2f;
 
+	[SerializeField]
+	private bool windowOpen = false;
+	
+	private int selectionGridInt = 0;
+	private string[] selectionStrings = {"Flock", "Disperse", "line", "Arrow"};
+	private Rect windowRect = new Rect(20, 20, 250, 400);
+	private bool targeting = true;
+
+	[SerializeField]
+	GameObject prefabUnitKnight1;
+	[SerializeField]
+	GameObject prefabUnitKnight2;
+	[SerializeField]
+	GameObject prefabUnitSoldier1;
+	[SerializeField]
+	GameObject prefabUnitSoldier2;
+	[SerializeField]
+	Transform spawn1;
+	[SerializeField]
+	Transform spawn2;
+
 	// Use this for initialization
 	void Start () {
-	
+		_army2.firstPlacementArmy();
+		_army1.firstPlacementArmy();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		charge(_army2, _army1);
+		if(_army1.get_status() == 0){
+			charge(_army1, _army2);
+		}else{
+			protect(_army1, _army2);
+		}
+
+		if(_army2.get_status() == 0){
+			charge(_army2, _army1);
+		}else{
+			protect(_army2, _army1);
+		}
 	}
 
 	public void charge(ArmyScript army, ArmyScript enemies){
-		float y_formationKnight, x_formationKnight, y_formationSoldiers, x_formationSoldiers;
 		Vector3 v1,v2,v3,v4,v5, v6;
-		if(army.get_army_Soldiers().Count < army.get_army_Knight().Count){
-			if(army.get_army_Knight().Count < 8){
-				y_formationKnight = _unitSize;
-				x_formationKnight = 8 * _unitSize;
-			}else{
-
-			}
-		}
-		foreach(UnitScript unit in army.get_army_Knight()){
-
-			v3 = keepDistance(unit, army.get_army_Knight(),1.5f);
-			//keepDistance(unit, enemies.get_army_Knight(),1);
-			v3 += keepDistance(unit, army.get_army_Soldiers(),1.5f);
-			//keepDistance(unit, enemies.get_army_Soldiers(),1);
+		Vector3 coordArmy = Vector3.zero;
+		int index = 0;
+		foreach(UnitScript unit in army.get_army_Soldiers()){
+			index++;
+			coordArmy += unit.transform.position;
+			v3 = keepDistance(unit, army.get_army_Knight(),1.0f);//Boucle x 4
+			v3 +=keepDistance(unit, enemies.get_army_Knight(),1f);
+			v3 += keepDistance(unit, army.get_army_Soldiers(),1.0f);
+			v3 +=keepDistance(unit, enemies.get_army_Soldiers(),1f);
 
 			v5 = bound_position(unit, this._limitCoordXmax, this._limitCoordXmin, this._limitCoordYmax, this._limitCoordYmin);
 
 			if(unit.getownWill() == false){
-			v1 = gravitate(unit, army.get_army_Knight());
-			v1 += gravitate(unit, army.get_army_Soldiers());
+				
+				//v2 = matchSpeed(unit, army.get_army_Knight());
+				v2 = matchSpeed(unit, army.get_army_Soldiers());
+				
+				if(enemies.coordGlobalArmy != null)
+				{
+					v4 = tendToward(unit, enemies.coordGlobalArmy);
+				}else
+				{
+					v4 = Vector3.zero;
+				}
+				
+				//v6 = bound_position(unit, army.get_army_Knight()[0].transform.position.x+10, army.get_army_Knight()[0].transform.position.x-10,army.get_army_Knight()[0].transform.position.z+10, army.get_army_Knight()[0].transform.position.z-10);
+				v6 = formationCharge(unit, army, index);
+				
+				unit.set_direction(v2+v3+v5+v6+v4);
+				limit_velocity(unit);
+				
+				unit.moveUnit();
+				unit.rotationUnit();
+				
+			}else{//L'unité agit independament de l'armée
+				//v4 = tendToward(unit, unit.getTarget().position);
+			}
 
-			v2 = matchSpeed(unit, army.get_army_Knight());
-			v2 += matchSpeed(unit, army.get_army_Soldiers());
+		}
 
-			v4 = tendToward(unit, Vector3.zero);
+		foreach(UnitScript unit in army.get_army_Knight()){
+			index ++;
+			coordArmy += unit.transform.position;
+			v3 = keepDistance(unit, army.get_army_Knight(),1.0f);//Boucle x 4
+			v3 +=keepDistance(unit, enemies.get_army_Knight(),1f);
+			v3 += keepDistance(unit, army.get_army_Soldiers(),1.0f);
+			v3 +=keepDistance(unit, enemies.get_army_Soldiers(),1f);
 
-			v6 = bound_position(unit, army.get_army_Knight()[0].transform.position.x+10, army.get_army_Knight()[0].transform.position.x-10,
-			                    army.get_army_Knight()[0].transform.position.z+10, army.get_army_Knight()[0].transform.position.z-10);
+			v5 = bound_position(unit, this._limitCoordXmax, this._limitCoordXmin, this._limitCoordYmax, this._limitCoordYmin);
 
-			unit.set_direction(v2+v3+v5+v6);
+			if(unit.getownWill() == false){
+
+			//v2 = matchSpeed(unit, army.get_army_Knight());
+			v2 = matchSpeed(unit, army.get_army_Soldiers());
+			
+			if(enemies.coordGlobalArmy != null)
+			{
+				v4 = tendToward(unit, enemies.coordGlobalArmy);
+			}else
+			{
+				v4 = Vector3.zero;
+			}
+
+			//v6 = bound_position(unit, army.get_army_Knight()[0].transform.position.x+10, army.get_army_Knight()[0].transform.position.x-10,army.get_army_Knight()[0].transform.position.z+10, army.get_army_Knight()[0].transform.position.z-10);
+			v6 = formationProtect(unit, army, index);
+
+			unit.set_direction(v2+v3+v5+v6+v4);
 			limit_velocity(unit);
 
 			unit.moveUnit();
+			unit.rotationUnit();
+
+			}else{//L'unité agit independament de l'armée
+				//v4 = tendToward(unit, unit.getTarget().position);
+			}
+		}
+		army.coordGlobalArmy = coordArmy/index;
+	}
+
+	public void protect(ArmyScript army, ArmyScript enemies){
+		Vector3 v1,v2,v3,v4,v5, v6;
+		int index = 0;
+		Vector3 coordArmy = Vector3.zero;
+
+		foreach(UnitScript unit in army.get_army_Knight()){
+			index ++;
+			coordArmy += unit.transform.position;
+			v3 = keepDistance(unit, army.get_army_Knight(),1.0f);
+			v3 += keepDistance(unit, enemies.get_army_Knight(),1);
+			v3 += keepDistance(unit, army.get_army_Soldiers(),1.0f);
+			v3 += keepDistance(unit, enemies.get_army_Soldiers(),1);
+			
+			v5 = bound_position(unit, this._limitCoordXmax, this._limitCoordXmin, this._limitCoordYmax, this._limitCoordYmin);
+			
+			if(unit.getownWill() == false){
+				
+				v2 = matchSpeed(unit, army.get_army_Knight());
+				v2 += matchSpeed(unit, army.get_army_Soldiers());
+				v6 = formationProtect(unit, army, index);
+
+				if(army.coordGlobalArmy != null)
+				{
+					v4 = tendToward(unit, army.coordGlobalArmy);
+				}else
+				{
+					v4 = Vector3.zero;
+				}
+				
+				unit.set_direction(v2+v3+v5+v6+v4);
+				limit_velocity(unit);
+				
+				unit.moveUnit();
+				unit.rotationUnit();
+				
 			}else{//se dirige vers ca cible
-				v4 = tendToward(unit, unit.getTarget().position);
+				//v4 = tendToward(unit, unit.getTarget().position);
 			}
 		}
 
+		foreach(UnitScript unit in army.get_army_Soldiers()){
+			index++;
+			coordArmy += unit.transform.position;
+			v3 = keepDistance(unit, army.get_army_Knight(),1.5f);//Boucle x 4
+			v3 += keepDistance(unit, enemies.get_army_Knight(),1.5f);
+			v3 += keepDistance(unit, army.get_army_Soldiers(),1.5f);
+			v3 +=keepDistance(unit, enemies.get_army_Soldiers(),1.5f);
+			
+			v5 = bound_position(unit, this._limitCoordXmax, this._limitCoordXmin, this._limitCoordYmax, this._limitCoordYmin);
+			
+			if(unit.getownWill() == false){
+				
+				v2 = matchSpeed(unit, army.get_army_Knight());
+				//v2 = matchSpeed(unit, army.get_army_Soldiers());
+				
+				v6 = formationProtect(unit, army, index);
+				if(army.coordGlobalArmy != null)
+				{
+					v4 = tendToward(unit, army.coordGlobalArmy);
+				}else
+				{
+					v4 = Vector3.zero;
+				}
+
+				unit.set_direction(v2+v3+v5+v6+v4);
+				limit_velocity(unit);
+				
+				unit.moveUnit();
+				unit.rotationUnit();
+				
+			}else{//L'unité agit independament de l'armée
+				//v4 = tendToward(unit, unit.getTarget().position);
+			}
+			
+		}
+		army.coordGlobalArmy = coordArmy/index;
 	}
 
 	//RULES
@@ -143,7 +291,7 @@ public class GameManagerScript : MonoBehaviour {
 		actualUnit.set_direction(new Vector3(actualUnit.get_direction().x,0, actualUnit.get_direction().z));
 		if(actualUnit.get_direction().magnitude > actualUnit.get_velocity()){
 			//Debug.Log(actualUnit.get_direction().magnitude);
-			actualUnit.set_direction((actualUnit.get_direction()/actualUnit.get_direction().magnitude)*0.05f);
+			actualUnit.set_direction((actualUnit.get_direction()/actualUnit.get_direction().magnitude)*actualUnit.get_velocity());
 		}
 	}
 
@@ -172,10 +320,80 @@ public class GameManagerScript : MonoBehaviour {
 		return vect;
 	}
 
-	void test(){
-		//foreach(UnitScript unit in _army2){
-			 
-		//}
+	public Vector3 formationProtect(UnitScript actualUnit, ArmyScript army, int index){
+		//Debug.Log("FORMATION army.rulePosition : "+army.rulePosition);
+		Vector3 direction = Vector3.zero;
+		if(army.get_army_Knight().Count > index){
+			direction = army.get_army_Knight()[0].transform.position + Vector3.left * 2 * ((index-1) % army.rulePosition) + Vector3.forward * -1 * 2 * ((index-1) / army.rulePosition);
+			return (direction - actualUnit.transform.position)/10;
+		}else{
+			if(army.get_army_Soldiers().Count > index){
+				direction = army.get_army_Knight()[0].transform.position + Vector3.left * 2 * ((index-army.get_army_Knight().Count) % army.rulePosition) + Vector3.forward * -1 * 2 * ((index-army.get_army_Knight().Count) / army.rulePosition)+ Vector3.forward * -2 ;
+				return (direction - actualUnit.transform.position)/10;
+			}
+		}
+		return direction;
+	}
+
+	public Vector3 formationCharge(UnitScript actualUnit, ArmyScript army, int index){
+		//Debug.Log("FORMATION army.rulePosition : "+army.rulePosition);
+		Vector3 direction = Vector3.zero;
+		if(army.get_army_Soldiers().Count > index){
+			direction = army.get_army_Soldiers()[0].transform.position + Vector3.left * 2 * ((index-1) % army.rulePosition) + Vector3.forward * -1 * 2 * ((index-1) / army.rulePosition);
+			return (direction - actualUnit.transform.position)/10;
+		}else{
+			if(army.get_army_Knight().Count > index){
+				direction = army.get_army_Soldiers()[0].transform.position + Vector3.left * 2 * ((index-army.get_army_Soldiers().Count) % army.rulePosition) + Vector3.forward * -1 * 2 * ((index-army.get_army_Soldiers().Count) / army.rulePosition)+ Vector3.forward * -2 ;
+				return (direction - actualUnit.transform.position)/10;
+			}
+		}
+		return direction;
+	}
+
+	//interface
+
+	void OnGUI(){
+		if(windowOpen){
+			windowRect = GUI.Window(0, windowRect, boidManagerWindow, "Army manager");
+		}else{
+			if(GUI.Button (new Rect (10,10,100,20), "Show")){
+				windowOpen = true;
+			}
+		}
+	}
+
+	public void boidManagerWindow(int windowID){
+		GUI.Label(new Rect(25, 25, 100, 20), "Fleet formation :");
+		GUI.DragWindow(new Rect(0, 0, 10000, 20));
+		if(GUI.Button (new Rect (25,125,100,20), "Hide")){
+			windowOpen = false;
+		}
+		if(GUI.Button (new Rect (25,140,60,20), "+ Knight1")){
+			GameObject clone_go = Instantiate(prefabUnitKnight1, spawn1.position, spawn1.rotation) as GameObject;
+			UnitScript clone_sc = clone_go.GetComponent<UnitScript>();//Didn't found another way for the creation
+			_army1.get_army_Knight().Add(clone_sc);
+		}
+
+		if(GUI.Button (new Rect (25,180,60,20), "+ Knight2")){
+			GameObject clone_go = Instantiate(prefabUnitKnight2, spawn2.position, spawn2.rotation) as GameObject;
+			UnitScript clone_sc = clone_go.GetComponent<UnitScript>();//Didn't found another way for the creation
+			_army2.get_army_Knight().Add(clone_sc);
+		}
+
+		if(GUI.Button (new Rect (25,200,60,20), "+ Soldier2")){
+			GameObject clone_go = Instantiate(prefabUnitSoldier2, spawn2.position, spawn2.rotation) as GameObject;
+			UnitScript clone_sc = clone_go.GetComponent<UnitScript>();//Didn't found another way for the creation
+			_army2.get_army_Knight().Add(clone_sc);
+		}
+
+		
+		/*if(GUI.Button (new Rect (50,150,20,20), "-")){
+			int index = spaceFleet.Count-1;
+			BoidScript temp = spaceFleet[index];
+			spaceFleet.RemoveAt(index);
+			temp.destroyItself();
+		}
+		GUI.Label(new Rect(25, 175, 200, 20), "Fleet number : "+spaceFleet.Count);*/
 	}
 
 }

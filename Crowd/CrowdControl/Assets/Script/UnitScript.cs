@@ -47,8 +47,14 @@ public class UnitScript : MonoBehaviour {
 	}
 
 	public void moveUnit(){
-		Debug.Log( "vector de direction : "+_direction+" distance parcouru : "+_direction.magnitude);
-		this.transform.position += this._direction;
+		//Debug.Log( "vector de direction : "+_direction+" distance parcouru : "+_direction.magnitude);
+		this.transform.position += this._direction*Time.deltaTime;
+	}
+
+	public void rotationUnit(){
+		Quaternion targetRotation = Quaternion.LookRotation (_direction);
+		float str = Mathf.Min (5 * Time.deltaTime, 1);
+		transform.rotation = Quaternion.Lerp (transform.rotation, targetRotation, str);
 	}
 
 	public void set_direction(Vector3 val){

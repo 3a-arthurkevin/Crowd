@@ -11,7 +11,11 @@ public class ArmyScript : MonoBehaviour {
 	private List<UnitScript>_army_Knight;
 
 	[SerializeField]
-	private int _status;
+	private int _status = 0;
+
+	public int rulePosition;
+
+	public Vector3 coordGlobalArmy;
 
 	// Use this for initialization
 	void Start () {
@@ -21,6 +25,24 @@ public class ArmyScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	
+	}
+
+	public void firstPlacementArmy(){
+		if(_army_Soldiers.Count < _army_Knight.Count){
+			if(_army_Knight.Count < 8){
+				rulePosition = 8;
+			}else{
+				rulePosition = (int) Mathf.Sqrt(_army_Knight.Count);
+				Debug.Log("Knight army : "+rulePosition);
+			}
+		}else{
+			if(_army_Soldiers.Count < 8){
+				rulePosition = 8;
+			}else{
+				rulePosition = (int) Mathf.Sqrt(_army_Soldiers.Count);
+				Debug.Log("soldier army : "+rulePosition);
+			}
+		}
 	}
 
 

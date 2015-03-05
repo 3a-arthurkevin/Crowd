@@ -2,11 +2,9 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Script\GameManagerScript.cs">
     <Files>
-      <File FileName="Assets\Script\GameManagerScript.cs" Line="74" Column="35" />
-      <File FileName="Assets\Script\UnitScript.cs" Line="103" Column="16" />
-      <File FileName="Assets\Script\ArmyScript.cs" Line="52" Column="1" />
-      <File FileName="Assets\Script\SoldierScript.cs" Line="16" Column="1" />
-      <File FileName="Assets\Script\KnightScript.cs" Line="16" Column="1" />
+      <File FileName="Assets\Script\GameManagerScript.cs" Line="196" Column="60" />
+      <File FileName="Assets\Script\ArmyScript.cs" Line="14" Column="25" />
+      <File FileName="Assets\Script\UnitScript.cs" Line="50" Column="5" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
