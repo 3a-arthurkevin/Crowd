@@ -54,6 +54,8 @@ public class GameManagerScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		_army1.set_status(1);
+		_army2.set_status(1);
 		if(_army1.get_status() == 0){
 			charge(_army1, _army2);
 		}else{
@@ -146,6 +148,7 @@ public class GameManagerScript : MonoBehaviour {
 			}
 		}
 		army.coordGlobalArmy = coordArmy/index;
+		army.firstPlacementArmy();
 	}
 
 	public void protect(ArmyScript army, ArmyScript enemies){
@@ -224,6 +227,7 @@ public class GameManagerScript : MonoBehaviour {
 			
 		}
 		army.coordGlobalArmy = coordArmy/index;
+		army.firstPlacementArmy();
 	}
 
 	//RULES
@@ -363,27 +367,33 @@ public class GameManagerScript : MonoBehaviour {
 	}
 
 	public void boidManagerWindow(int windowID){
-		GUI.Label(new Rect(25, 25, 100, 20), "Fleet formation :");
+		GUI.Label(new Rect(25, 25, 100, 20), "Army :");
 		GUI.DragWindow(new Rect(0, 0, 10000, 20));
-		if(GUI.Button (new Rect (25,125,100,20), "Hide")){
+		if(GUI.Button (new Rect (25,50,100,20), "Hide")){
 			windowOpen = false;
 		}
-		if(GUI.Button (new Rect (25,140,60,20), "+ Knight1")){
+		if(GUI.Button (new Rect (25,75,100,20), "+ Knight1")){
 			GameObject clone_go = Instantiate(prefabUnitKnight1, spawn1.position, spawn1.rotation) as GameObject;
 			UnitScript clone_sc = clone_go.GetComponent<UnitScript>();//Didn't found another way for the creation
 			_army1.get_army_Knight().Add(clone_sc);
 		}
 
-		if(GUI.Button (new Rect (25,180,60,20), "+ Knight2")){
+		if(GUI.Button (new Rect (25,100,100,20), "+ Soldier1")){
+			GameObject clone_go = Instantiate(prefabUnitSoldier1, spawn1.position, spawn1.rotation) as GameObject;
+			UnitScript clone_sc = clone_go.GetComponent<UnitScript>();//Didn't found another way for the creation
+			_army1.get_army_Soldiers().Add(clone_sc);
+		}
+
+		if(GUI.Button (new Rect (25,125,100,20), "+ Knight2")){
 			GameObject clone_go = Instantiate(prefabUnitKnight2, spawn2.position, spawn2.rotation) as GameObject;
 			UnitScript clone_sc = clone_go.GetComponent<UnitScript>();//Didn't found another way for the creation
 			_army2.get_army_Knight().Add(clone_sc);
 		}
 
-		if(GUI.Button (new Rect (25,200,60,20), "+ Soldier2")){
+		if(GUI.Button (new Rect (25,150,100,20), "+ Soldier2")){
 			GameObject clone_go = Instantiate(prefabUnitSoldier2, spawn2.position, spawn2.rotation) as GameObject;
 			UnitScript clone_sc = clone_go.GetComponent<UnitScript>();//Didn't found another way for the creation
-			_army2.get_army_Knight().Add(clone_sc);
+			_army2.get_army_Soldiers().Add(clone_sc);
 		}
 
 		
