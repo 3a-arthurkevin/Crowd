@@ -11,7 +11,7 @@ public class ArmyScript : MonoBehaviour {
 	private List<UnitScript>_army_Knight;
 
 	[SerializeField]
-	private int _status;
+	private int _status = 0;
 
 	public int rulePosition;
 

@@ -25,6 +25,27 @@ public class GameManagerScript : MonoBehaviour {
 	[SerializeField]
 	private float _unitSize = 2f;
 
+	[SerializeField]
+	private bool windowOpen = false;
+	
+	private int selectionGridInt = 0;
+	private string[] selectionStrings = {"Flock", "Disperse", "line", "Arrow"};
+	private Rect windowRect = new Rect(20, 20, 250, 400);
+	private bool targeting = true;
+
+	[SerializeField]
+	GameObject prefabUnitKnight1;
+	[SerializeField]
+	GameObject prefabUnitKnight2;
+	[SerializeField]
+	GameObject prefabUnitSoldier1;
+	[SerializeField]
+	GameObject prefabUnitSoldier2;
+	[SerializeField]
+	Transform spawn1;
+	[SerializeField]
+	Transform spawn2;
+
 	// Use this for initialization
 	void Start () {
 		_army2.firstPlacementArmy();
@@ -33,7 +54,17 @@ public class GameManagerScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		charge(_army2, _army1);
+		if(_army1.get_status() == 0){
+			charge(_army1, _army2);
+		}else{
+			protect(_army1, _army2);
+		}
+
+		if(_army2.get_status() == 0){
+			charge(_army2, _army1);
+		}else{
+			protect(_army2, _army1);
+		}
 	}
 
 	public void charge(ArmyScript army, ArmyScript enemies){
@@ -160,10 +191,10 @@ public class GameManagerScript : MonoBehaviour {
 		foreach(UnitScript unit in army.get_army_Soldiers()){
 			index++;
 			coordArmy += unit.transform.position;
-			v3 = keepDistance(unit, army.get_army_Knight(),1.0f);//Boucle x 4
-			v3 +=keepDistance(unit, enemies.get_army_Knight(),1f);
-			v3 += keepDistance(unit, army.get_army_Soldiers(),1.0f);
-			v3 +=keepDistance(unit, enemies.get_army_Soldiers(),1f);
+			v3 = keepDistance(unit, army.get_army_Knight(),1.5f);//Boucle x 4
+			v3 += keepDistance(unit, enemies.get_army_Knight(),1.5f);
+			v3 += keepDistance(unit, army.get_army_Soldiers(),1.5f);
+			v3 +=keepDistance(unit, enemies.get_army_Soldiers(),1.5f);
 			
 			v5 = bound_position(unit, this._limitCoordXmax, this._limitCoordXmin, this._limitCoordYmax, this._limitCoordYmin);
 			
@@ -298,7 +329,7 @@ public class GameManagerScript : MonoBehaviour {
 		}else{
 			if(army.get_army_Soldiers().Count > index){
 				direction = army.get_army_Knight()[0].transform.position + Vector3.left * 2 * ((index-army.get_army_Knight().Count) % army.rulePosition) + Vector3.forward * -1 * 2 * ((index-army.get_army_Knight().Count) / army.rulePosition)+ Vector3.forward * -2 ;
-				return (direction - actualUnit.transform.position)/100;
+				return (direction - actualUnit.transform.position)/10;
 			}
 		}
 		return direction;
@@ -313,16 +344,56 @@ public class GameManagerScript : MonoBehaviour {
 		}else{
 			if(army.get_army_Knight().Count > index){
 				direction = army.get_army_Soldiers()[0].transform.position + Vector3.left * 2 * ((index-army.get_army_Soldiers().Count) % army.rulePosition) + Vector3.forward * -1 * 2 * ((index-army.get_army_Soldiers().Count) / army.rulePosition)+ Vector3.forward * -2 ;
-				return (direction - actualUnit.transform.position)/100;
+				return (direction - actualUnit.transform.position)/10;
 			}
 		}
 		return direction;
 	}
 
-	void test(){
-		//foreach(UnitScript unit in _army2){
-			 
-		//}
+	//interface
+
+	void OnGUI(){
+		if(windowOpen){
+			windowRect = GUI.Window(0, windowRect, boidManagerWindow, "Army manager");
+		}else{
+			if(GUI.Button (new Rect (10,10,100,20), "Show")){
+				windowOpen = true;
+			}
+		}
+	}
+
+	public void boidManagerWindow(int windowID){
+		GUI.Label(new Rect(25, 25, 100, 20), "Fleet formation :");
+		GUI.DragWindow(new Rect(0, 0, 10000, 20));
+		if(GUI.Button (new Rect (25,125,100,20), "Hide")){
+			windowOpen = false;
+		}
+		if(GUI.Button (new Rect (25,140,60,20), "+ Knight1")){
+			GameObject clone_go = Instantiate(prefabUnitKnight1, spawn1.position, spawn1.rotation) as GameObject;
+			UnitScript clone_sc = clone_go.GetComponent<UnitScript>();//Didn't found another way for the creation
+			_army1.get_army_Knight().Add(clone_sc);
+		}
+
+		if(GUI.Button (new Rect (25,180,60,20), "+ Knight2")){
+			GameObject clone_go = Instantiate(prefabUnitKnight2, spawn2.position, spawn2.rotation) as GameObject;
+			UnitScript clone_sc = clone_go.GetComponent<UnitScript>();//Didn't found another way for the creation
+			_army2.get_army_Knight().Add(clone_sc);
+		}
+
+		if(GUI.Button (new Rect (25,200,60,20), "+ Soldier2")){
+			GameObject clone_go = Instantiate(prefabUnitSoldier2, spawn2.position, spawn2.rotation) as GameObject;
+			UnitScript clone_sc = clone_go.GetComponent<UnitScript>();//Didn't found another way for the creation
+			_army2.get_army_Knight().Add(clone_sc);
+		}
+
+		
+		/*if(GUI.Button (new Rect (50,150,20,20), "-")){
+			int index = spaceFleet.Count-1;
+			BoidScript temp = spaceFleet[index];
+			spaceFleet.RemoveAt(index);
+			temp.destroyItself();
+		}
+		GUI.Label(new Rect(25, 175, 200, 20), "Fleet number : "+spaceFleet.Count);*/
 	}
 
 }
