@@ -17,6 +17,7 @@ public class GUIScript : MonoBehaviour
     CameraZoomScript _cameraZoomScript;
 
 
+
     [SerializeField]
     GameObject _runButton;
 
@@ -25,6 +26,8 @@ public class GUIScript : MonoBehaviour
 
     [SerializeField]
     GameObject _restartButton;
+
+
 
     [SerializeField]
     GameObject _minusUnitButton;
@@ -38,6 +41,22 @@ public class GUIScript : MonoBehaviour
     [SerializeField]
     Text _nbUnitLabel;
 
+
+
+    [SerializeField]
+    GameObject _minusUnitRowButton;
+
+    [SerializeField]
+    GameObject _plusUnitRowButton;
+
+    [SerializeField]
+    Text _unitRowLabel;
+
+    [SerializeField]
+    Text _nbUnitRowLabel;
+
+
+
     [SerializeField]
     int _nbUnitMin;
 
@@ -50,24 +69,47 @@ public class GUIScript : MonoBehaviour
     [SerializeField]
     int _initialNbUnit;
 
-    int nbUnit;
+
+
+    [SerializeField]
+    int _nbUnitMinRow;
+
+    [SerializeField]
+    int _nbUnitMaxRow;
+
+    [SerializeField]
+    int _nbUnitStepRow;
+
+    [SerializeField]
+    int _initialNbUnitRow;
+
+    int _nbUnit;
+    int _nbUnitRow;
 
 	// Use this for initialization
 	void Start () 
     {
-        enableScript(false);
+        EnableScript(false);
 
         if (_initialNbUnit < _nbUnitMin)
-            nbUnit = _nbUnitMin;
+            _nbUnit = _nbUnitMin;
         else if (_initialNbUnit > _nbUnitMax)
-            nbUnit = _nbUnitMax;
+            _nbUnit = _nbUnitMax;
         else
-            nbUnit = _initialNbUnit;
+            _nbUnit = _initialNbUnit;
+
+        if (_initialNbUnitRow < _nbUnitMinRow)
+            _nbUnitRow = _nbUnitMinRow;
+        else if (_initialNbUnitRow > _nbUnitMaxRow)
+            _nbUnitRow = _nbUnitMaxRow;
+        else
+            _nbUnitRow = _initialNbUnitRow;
 
         SetNbUnitLabel();
+        SetNbUnitRowLabel();
 	}
 
-    void enableScript(bool value)
+    void EnableScript(bool value)
     {
         _cameraFollowMouseScript.enabled = value;
         _cameraZoomScript.enabled = value;
@@ -75,14 +117,24 @@ public class GUIScript : MonoBehaviour
         _houndMoveScriptArmyB.enabled = value;
     }
 
-    void PassingNbUnitParameter()
+    void PassingUiParameters()
     {
+        _houndMoveScriptArmyA.NbTotalUnits = _nbUnit;
+        _houndMoveScriptArmyB.NbTotalUnits = _nbUnit;
+
+        _houndMoveScriptArmyA.NbUnitInOneRow = _nbUnitRow;
+        _houndMoveScriptArmyB.NbUnitInOneRow = _nbUnitRow;
 
     }
 
     void SetNbUnitLabel()
     {
-        _nbUnitLabel.text = nbUnit.ToString();
+        _nbUnitLabel.text = _nbUnit.ToString();
+    }
+
+    void SetNbUnitRowLabel()
+    {
+        _nbUnitRowLabel.text = _nbUnitRow.ToString();
     }
 
     void DisableUiElementsAfterRun()
@@ -92,35 +144,64 @@ public class GUIScript : MonoBehaviour
         _plusUnitButton.SetActive(false);
         _unitLabel.enabled = false;
         _nbUnitLabel.enabled = false;
+
+        _minusUnitRowButton.SetActive(false);
+        _plusUnitRowButton.SetActive(false);
+        _unitRowLabel.enabled = false;
+        _nbUnitRowLabel.enabled = false;
     }
 
     public void MinusNbUnit()
     {
-        if(nbUnit > _nbUnitMin)
-            nbUnit -= _nbUnitStep;
+        if(_nbUnit > _nbUnitMin)
+            _nbUnit -= _nbUnitStep;
 
-        if (nbUnit < _nbUnitMin)
-            nbUnit = _nbUnitMin;
+        if (_nbUnit < _nbUnitMin)
+            _nbUnit = _nbUnitMin;
 
         SetNbUnitLabel();
     }
 
     public void PlusNbUnit()
     {
-        if (nbUnit < _nbUnitMax)
-            nbUnit += _nbUnitStep;
+        if (_nbUnit < _nbUnitMax)
+            _nbUnit += _nbUnitStep;
 
-        if (nbUnit > _nbUnitMax)
-            nbUnit = _nbUnitMax;
+        if (_nbUnit > _nbUnitMax)
+            _nbUnit = _nbUnitMax;
 
         SetNbUnitLabel();
+    }
+
+    public void MinusNbUnitRow()
+    {
+        if (_nbUnitRow > _nbUnitMinRow)
+            _nbUnitRow -= _nbUnitStepRow;
+
+        if (_nbUnitRow < _nbUnitMinRow)
+            _nbUnitRow = _nbUnitMinRow;
+
+        SetNbUnitRowLabel();
+    }
+
+    public void PlusNbUnitRow()
+    {
+        if (_nbUnitRow < _nbUnitMaxRow)
+            _nbUnitRow += _nbUnitStepRow;
+
+        if (_nbUnitRow > _nbUnitMaxRow)
+            _nbUnitRow = _nbUnitMaxRow;
+
+        SetNbUnitRowLabel();
     }
 
     public void Run()
     {
         DisableUiElementsAfterRun();
 
-        enableScript(true);
+        PassingUiParameters();
+
+        EnableScript(true);
     }
 
     public void CloseApp()

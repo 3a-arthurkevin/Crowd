@@ -49,6 +49,12 @@ public class HoundMoveScript : MonoBehaviour
         set { _nbTotalUnits = value; }
     }
 
+    public int NbUnitInOneRow
+    {
+        get { return _nbUnitInOneRow; }
+        set { _nbUnitInOneRow = value; }
+    }
+
     public List<UnitMoveScript> UnitMoveScriptsArmy
     {
         get { return _unitMoveScriptsArmy; }

@@ -32,7 +32,7 @@ public class CameraZoomScript : MonoBehaviour
         {
             if (_nbScroll <= _scrollLimitMax)
             {
-                _characterController.Move(_cameraTransform.rotation * Vector3.forward * Time.deltaTime * _scrollSpeed * mouvement);
+                _characterController.Move(_cameraTransform.rotation * Vector3.forward * _scrollSpeed * mouvement);
                 _nbScroll += mouvement;
             }
         }
@@ -40,7 +40,7 @@ public class CameraZoomScript : MonoBehaviour
         {
             if (_nbScroll >= _scrollLimitMin)
             {
-                _characterController.Move(_cameraTransform.rotation * Vector3.forward * Time.deltaTime * _scrollSpeed * mouvement);
+                _characterController.Move(_cameraTransform.rotation * Vector3.forward * _scrollSpeed * mouvement);
                 _nbScroll += mouvement;
             }
         }
