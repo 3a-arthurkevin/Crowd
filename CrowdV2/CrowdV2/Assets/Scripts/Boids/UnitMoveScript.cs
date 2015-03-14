@@ -42,14 +42,19 @@ public class UnitMoveScript : MonoBehaviour
 
     Vector3 _random;
 
+	Animator anim;
+
 	// Use this for initialization
 	void Start () 
     {
         _random = Vector3.zero;
-
+		anim = GetComponent<Animator>();
         StartCoroutine(SetRandom());
 
         StartCoroutine(LookingForTarget());
+	}
+	void Awake() {
+		anim = GetComponent<Animator>();
 	}
 
     void OnEnable()
@@ -65,6 +70,7 @@ public class UnitMoveScript : MonoBehaviour
 
     public void ApplyMove(Vector3 houndTarget)
     {
+		anim.SetInteger("UnitAction", 4);
         if (_target != null)
         {
             if (_target.activeSelf)
@@ -94,7 +100,7 @@ public class UnitMoveScript : MonoBehaviour
     {
         Vector3 currentPosition = new Vector3(_unitTransform.position.x, _unitTransform.position.y, _unitTransform.position.z);
         Vector3 targetPosition = new Vector3(target.x, target.y, target.z) + _random;
-
+		anim.SetInteger("UnitAction", 2);
         LookRotation(targetPosition);
 
         _unitTransform.position = Vector3.MoveTowards(currentPosition, targetPosition, _moveSpeed * Time.deltaTime);
